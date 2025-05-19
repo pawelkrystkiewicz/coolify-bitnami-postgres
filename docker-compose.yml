@@ -23,7 +23,7 @@ services:
       - POSTGRESQL_ALLOW_REMOTE_CONNECTIONS=${POSTGRESQL_ALLOW_REMOTE_CONNECTIONS}
     volumes:
       - postgresql_data:/bitnami/postgresql
-      - ./certs:/certs:ro
+      - ./certs:/certs
     ports:
       - '5432:5432'
     labels:
