@@ -1,6 +1,6 @@
 # PostgreSQL Docker Container
 
-A secure PostgreSQL database container using Bitnami's PostgreSQL image with TLS encryption and enhanced logging.
+A secure PostgreSQL database container using Bitnami's PostgreSQL image with TLS encryption and enhanced logging. The base for this service is an official Bitnami PostgresQL image, please [reference the docs](https://github.com/bitnami/containers/blob/main/bitnami/postgresql/README.md) for full feature and env variables list
 
 ## Features
 
