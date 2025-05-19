@@ -1,0 +1,59 @@
+services:
+  postgresql:
+    image: bitnami/postgresql:latest
+    container_name: postgres-database
+    environment:
+      - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
+      - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+      - POSTGRESQL_POSTGRES_PASSWORD=${POSTGRESQL_POSTGRES_PASSWORD}
+      - POSTGRESQL_ENABLE_TLS=yes
+      - POSTGRESQL_TLS_CERT_FILE=/certs/server.crt
+      - POSTGRESQL_TLS_KEY_FILE=/certs/server.key
+      - POSTGRESQL_TLS_CA_FILE=/certs/ca.crt
+      - POSTGRESQL_PASSWORD_ENCRYPTION=scram-sha-256
+      - POSTGRESQL_LOG_CONNECTIONS=yes
+      - POSTGRESQL_LOG_DISCONNECTIONS=yes
+      - POSTGRESQL_PGAUDIT_LOG=read,write
+      - POSTGRESQL_CLIENT_MIN_MESSAGES=error
+      - POSTGRESQL_LOG_TIMEZONE=true
+      - POSTGRESQL_STATEMENT_TIMEOUT=${POSTGRESQL_STATEMENT_TIMEOUT}
+      - POSTGRESQL_MAX_CONNECTIONS=${POSTGRESQL_MAX_CONNECTIONS}
+      - POSTGRESQL_USERNAME_CONNECTION_LIMIT=${POSTGRESQL_USERNAME_CONNECTION_LIMIT}
+      - POSTGRESQL_PGHBA_REMOVE_FILTERS=${POSTGRESQL_PGHBA_REMOVE_FILTERS}
+      - POSTGRESQL_ALLOW_REMOTE_CONNECTIONS=${POSTGRESQL_ALLOW_REMOTE_CONNECTIONS}
+    volumes:
+      - postgresql_data:/bitnami/postgresql
+      - ./certs:/certs:ro
+    ports:
+      - '5432:5432'
+    labels:
+      - 'coolify.description=Bitnami PostgreSQL'
+      - 'coolify.environment.1.name=POSTGRESQL_USERNAME'
+      - 'coolify.environment.1.description=Default username'
+      - 'coolify.environment.1.required=true'
+      - 'coolify.environment.2.name=POSTGRESQL_PASSWORD'
+      - 'coolify.environment.2.description=Password for user'
+      - 'coolify.environment.2.required=true'
+      - 'coolify.environment.2.type=password'
+      - 'coolify.environment.3.name=POSTGRESQL_POSTGRES_PASSWORD'
+      - 'coolify.environment.3.description=Password for postgres user'
+      - 'coolify.environment.3.required=true'
+      - 'coolify.environment.3.type=password'
+      - 'coolify.environment.4.name=POSTGRESQL_STATEMENT_TIMEOUT'
+      - 'coolify.environment.4.description=SQL query timeout (ms)'
+      - 'coolify.environment.4.default=30000'
+      - 'coolify.environment.5.name=POSTGRESQL_MAX_CONNECTIONS'
+      - 'coolify.environment.5.description=Maximum number of connections'
+      - 'coolify.environment.5.default=100'
+      - 'coolify.environment.6.name=POSTGRESQL_USERNAME_CONNECTION_LIMIT'
+      - 'coolify.environment.6.description=Connections limit per user'
+      - 'coolify.environment.6.default=10'
+      - 'coolify.environment.7.name=POSTGRESQL_PGHBA_REMOVE_FILTERS'
+      - 'coolify.environment.7.description=Remove unsafe methods from pg_hba.conf (e.g. trust)'
+      - 'coolify.environment.7.default=trust,peer'
+      - 'coolify.environment.8.name=POSTGRESQL_ALLOW_REMOTE_CONNECTIONS'
+      - 'coolify.environment.8.description=Allow remote connections (from outside of the container)'
+      - 'coolify.environment.8.default=yes'
+
+volumes:
+  postgresql_data:
