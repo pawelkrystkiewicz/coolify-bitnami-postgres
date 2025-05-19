@@ -21,11 +21,12 @@ services:
       - POSTGRESQL_USERNAME_CONNECTION_LIMIT=${POSTGRESQL_USERNAME_CONNECTION_LIMIT}
       - POSTGRESQL_PGHBA_REMOVE_FILTERS=${POSTGRESQL_PGHBA_REMOVE_FILTERS}
       - POSTGRESQL_ALLOW_REMOTE_CONNECTIONS=${POSTGRESQL_ALLOW_REMOTE_CONNECTIONS}
+      - PORT=${PORT}
     volumes:
       - postgresql_data:/bitnami/postgresql
       - ./certs:/certs
     ports:
-      - '5432:5432'
+      - '${PORT}:5432'
     labels:
       - 'coolify.description=Bitnami PostgreSQL'
       - 'coolify.environment.1.name=POSTGRESQL_USERNAME'
@@ -54,6 +55,9 @@ services:
       - 'coolify.environment.8.name=POSTGRESQL_ALLOW_REMOTE_CONNECTIONS'
       - 'coolify.environment.8.description=Allow remote connections (from outside of the container)'
       - 'coolify.environment.8.default=yes'
+      - 'coolify.environment.9.name=PORT'
+      - 'coolify.environment.9.description=Port to listen on'
+      - 'coolify.environment.9.default=5432'
 
 volumes:
   postgresql_data:
