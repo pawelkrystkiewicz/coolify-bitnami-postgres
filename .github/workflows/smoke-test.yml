@@ -27,13 +27,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Prepare compose file
+        run: envsubst < docker-compose.yml > docker-compose.ci.yml
+
       - name: Create external networks
         run: |
           docker network create monitoring
           docker network create shared-postgres
 
       - name: Start services
-        run: docker compose up -d --wait
+        run: docker compose -f docker-compose.ci.yml up -d --wait
 
       - name: Test connection and basic query
         run: PGPASSWORD=testpassword psql -h localhost -U testuser -d postgres -c "SELECT 1 AS connected;"
@@ -58,4 +61,4 @@ jobs:
 
       - name: Cleanup
         if: always()
-        run: docker compose down -v
+        run: docker compose -f docker-compose.ci.yml down -v
