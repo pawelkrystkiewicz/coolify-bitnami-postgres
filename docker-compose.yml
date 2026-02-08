@@ -27,8 +27,8 @@ services:
     volumes:
       - postgresql_data:/bitnami/postgresql
     networks:
-      - ${NETWORK_MONITORING}
-      - ${NETWORK_DATABASE}
+      - monitoring
+      - shared-postgres
     ports:
       - '${PORT}:5432'
     labels:
@@ -70,10 +70,12 @@ services:
       - 'coolify.environment.11.default=shared-postgres'
 
 networks:
-  ${NETWORK_MONITORING}:
+  monitoring:
     external: true
-  ${NETWORK_DATABASE}:
+    name: ${NETWORK_MONITORING}
+  database:
     external: true
+    name: ${NETWORK_DATABASE}
 
 volumes:
   postgresql_data:
