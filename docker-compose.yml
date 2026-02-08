@@ -1,7 +1,13 @@
 services:
   postgresql:
-    image: bitnami/postgresql:latest
+    image: bitnami/postgresql:18
     container_name: postgres-database
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRESQL_USERNAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
     environment:
       - POSTGRESQL_USERNAME=${POSTGRESQL_USERNAME}
       - POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
@@ -20,6 +26,9 @@ services:
       - PORT=${PORT}
     volumes:
       - postgresql_data:/bitnami/postgresql
+    networks:
+      - ${NETWORK_MONITORING}
+      - ${NETWORK_DATABASE}
     ports:
       - '${PORT}:5432'
     labels:
@@ -53,6 +62,18 @@ services:
       - 'coolify.environment.9.name=PORT'
       - 'coolify.environment.9.description=Port to listen on'
       - 'coolify.environment.9.default=5432'
+      - 'coolify.environment.10.name=NETWORK_MONITORING'
+      - 'coolify.environment.10.description=External network for monitoring (shared variable)'
+      - 'coolify.environment.10.default=monitoring'
+      - 'coolify.environment.11.name=NETWORK_DATABASE'
+      - 'coolify.environment.11.description=External network for sharing database between projects (shared variable)'
+      - 'coolify.environment.11.default=shared-postgres'
+
+networks:
+  ${NETWORK_MONITORING}:
+    external: true
+  ${NETWORK_DATABASE}:
+    external: true
 
 volumes:
   postgresql_data:
