@@ -1,0 +1,64 @@
+name: Test docker-compose.yml
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+env:
+  POSTGRESQL_USERNAME: testuser
+  POSTGRESQL_PASSWORD: testpassword
+  POSTGRESQL_POSTGRES_PASSWORD: postgres_superuser
+  POSTGRESQL_STATEMENT_TIMEOUT: "30000"
+  POSTGRESQL_MAX_CONNECTIONS: "100"
+  POSTGRESQL_USERNAME_CONNECTION_LIMIT: "10"
+  POSTGRESQL_PGHBA_REMOVE_FILTERS: trust,peer
+  POSTGRESQL_ALLOW_REMOTE_CONNECTIONS: "yes"
+  PORT: "5432"
+  NETWORK_MONITORING: monitoring
+  NETWORK_DATABASE: shared-postgres
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare compose file
+        run: envsubst < docker-compose.yml > docker-compose.ci.yml
+
+      - name: Create external networks
+        run: |
+          docker network create monitoring
+          docker network create shared-postgres
+
+      - name: Start services
+        run: docker compose -f docker-compose.ci.yml up -d --wait
+
+      - name: Test connection and basic query
+        run: PGPASSWORD=testpassword psql -h localhost -U testuser -d postgres -c "SELECT 1 AS connected;"
+
+      - name: Verify configuration
+        run: |
+          PGPASSWORD=testpassword psql -h localhost -U testuser -d postgres <<'SQL'
+            SELECT
+              current_setting('statement_timeout') AS statement_timeout,
+              current_setting('max_connections') AS max_connections,
+              current_setting('password_encryption') AS password_encryption;
+          SQL
+
+      - name: Test CRUD operations
+        run: |
+          PGPASSWORD=testpassword psql -h localhost -U testuser -d postgres <<'SQL'
+            CREATE TABLE smoke_test (id serial PRIMARY KEY, value text NOT NULL);
+            INSERT INTO smoke_test (value) VALUES ('hello');
+            SELECT * FROM smoke_test;
+            DROP TABLE smoke_test;
+          SQL
+
+      - name: Cleanup
+        if: always()
+        run: docker compose -f docker-compose.ci.yml down -v
