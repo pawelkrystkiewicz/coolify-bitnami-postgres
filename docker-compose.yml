@@ -1,6 +1,6 @@
 services:
   postgresql:
-    image: bitnami/postgresql@sha256:8c7f26a8ba4257fcbf4445bd50e156cbc7d8114942fb3d6523320c7732781b54
+    image: bitnami/postgresql@sha256:e8b68936d05ee665974430bb4765fedcdc5c9ba399e133e120e2deed77f54dbf
     container_name: postgres-database
     restart: unless-stopped
     healthcheck:
